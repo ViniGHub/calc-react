@@ -10,6 +10,8 @@
     border-right: var(--border-button);
     border-bottom: var(--border-button);
     outline: none;
+    border-radius: 40px;
+    margin: 2px;
 
     &:active {
         background-color: #ccc;

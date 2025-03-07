@@ -7,7 +7,7 @@ const initialState = {
     displayValue: "0",
     clearDisplay: false,
     operation: null,
-    values: [0, 0],
+    values: [undefined, undefined],
     current: 0
 }
 
@@ -26,16 +26,20 @@ export default class Calculator extends Component {
         this.setState({ ...initialState })
     }
 
-    setOperation = (operation) => {
+    setOperation = (operation, instant = false) => {
         if (this.state.current === 0) {
-            this.setState({ operation, current: 1, clearDisplay: true })
-        } else {
+            const values = [...this.state.values]
+            if (instant) {
+                values[0] = eval(`${this.state.values[0] ?? 0} ${operation}`)
+
+            }
+            this.setState({ operation, current: instant ? 0 : 1, clearDisplay: instant ? false : true, values, displayValue: values[0] })
+        } else if (this.state.values[1] !== undefined) {
             const equals = operation === "="
             const currentOperation = this.state.operation
 
             const values = [...this.state.values]
 
-            debugger;
             try {
                 values[0] = eval(`${values[0]} ${currentOperation} ${values[1]}`)
                 if (isNaN(values[0]) || !isFinite(values[0])) {
@@ -45,7 +49,7 @@ export default class Calculator extends Component {
             } catch(e) {
                 values[0] = this.state.values[0]
             }
-            values[1] = 0
+            values[1] = undefined
 
             this.setState({
                 displayValue: values[0],
@@ -84,7 +88,9 @@ export default class Calculator extends Component {
         return (
             <div className="calculator">
                 <Display value={this.state.displayValue} />
-                <Button label="AC" click={this.clearMemory} triple />
+                <Button label="AC" click={this.clearMemory} />
+                <Button text="-/+" label="* -1" click={this.setOperation} operation instant />
+                <Button text="%" label="/100" click={this.setOperation} operation instant />
                 <Button label="/" click={this.setOperation} operation />
                 <Button label="7" click={this.addDigit} />
                 <Button label="8" click={this.addDigit} />
